@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- dumbbell -->
+    <path android:fillColor="#FFD97757"
+        android:pathData="M30,44h6v20h-6z M38,38h7v32h-7z M63,38h7v32h-7z M72,44h6v20h-6z M45,51h18v6h-18z" />
+</vector>

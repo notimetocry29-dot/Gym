@@ -7,6 +7,8 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -55,7 +57,9 @@ class AppFlowTest {
         }
     }
 
-    private fun waitText(t: String) = waitFor(hasText(t, substring = true))
+    private fun waitText(t: String) = waitFor(hasText(t, substring = true, ignoreCase = true))
+
+    private fun inDialog(t: String) = rule.onAllNodes(hasText(t) and hasAnyAncestor(isDialog()))
 
     @Test
     fun fullWorkoutFlow() {
@@ -114,7 +118,7 @@ class AppFlowTest {
         rule.onAllNodesWithText("Finish").onFirst().performClick()
         waitText("sets will be saved")
         shot("11-finish-dialog")
-        rule.onAllNodesWithText("Finish").onLast().performClick()
+        inDialog("Finish").onFirst().performClick()
 
         waitText("Repeat this workout")
         waitText("60 kg × 8")
@@ -136,7 +140,7 @@ class AppFlowTest {
         rule.onNodeWithText("Log weight").performClick()
         waitText("Log body weight")
         rule.onAllNodes(hasSetTextAction()).onLast().performTextInput("82.5")
-        rule.onNodeWithText("Save").performClick()
+        inDialog("Save").onFirst().performClick()
         waitText("82.5 kg")
         shot("16-body-weight")
 
@@ -145,7 +149,7 @@ class AppFlowTest {
         waitText("Do another day")
         rule.onNodeWithText("Do another day").performClick()
         waitText("From your rotation")
-        rule.onAllNodesWithText("Upper A").onFirst().performClick()
+        inDialog("Upper A").onFirst().performClick()
         waitText("Go up +2.5 kg")
         waitText("62.5 kg")
         shot("17-suggestion")

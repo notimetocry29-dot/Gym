@@ -1,14 +1,12 @@
 package app.gymtracker
 
 import android.graphics.Bitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
+import android.graphics.Canvas
 import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -37,10 +35,15 @@ class AppFlowTest {
 
     private val outDir = File("build/screens").apply { mkdirs() }
 
+    /** Draws the activity window (dialogs are separate windows, so they are not included). */
     private fun shot(name: String) {
         rule.waitForIdle()
-        val bmp = rule.onAllNodes(isRoot()).onLast().captureToImage().asAndroidBitmap()
-        File(outDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        runCatching {
+            val view = rule.activity.window.decorView
+            val bmp = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+            view.draw(Canvas(bmp))
+            File(outDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        }.onFailure { println("Screenshot $name failed: $it") }
     }
 
     private fun waitFor(matcher: SemanticsMatcher, timeout: Long = 15_000) {

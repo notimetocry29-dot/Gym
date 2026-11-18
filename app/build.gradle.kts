@@ -48,6 +48,12 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all { it.maxHeapSize = "2g" }
+        }
+    }
 }
 
 dependencies {
@@ -70,4 +76,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation(composeBom)
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

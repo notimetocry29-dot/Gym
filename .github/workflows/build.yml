@@ -17,8 +17,8 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Test and build
-        run: ./gradlew testDebugUnitTest assembleRelease --console=plain
+      - name: Logic tests and build
+        run: ./gradlew testDebugUnitTest --tests '*LogicTest*' assembleRelease --console=plain
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk GymTracker.apk
       - uses: actions/upload-artifact@v4
@@ -33,3 +33,17 @@ jobs:
           gh release create latest GymTracker.apk --prerelease --target "$GITHUB_SHA" \
             --title "Gym Tracker (latest build)" \
             --notes "Built from ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}. Download GymTracker.apk on your phone and install it."
+      - name: UI flow test (runs the real app in Robolectric, saves screenshots)
+        run: ./gradlew testDebugUnitTest --tests '*AppFlowTest*' --console=plain
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: app/build/screens/
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: app/build/reports/tests/
